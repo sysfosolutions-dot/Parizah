@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+
+const SizeGuide = () => {
+        const [modal, setModal] = useState(false);
+        const toggle = () => setModal(!modal);
+
+
+  return (
+    <>
+        
+    <div data-bs-toggle="modal" onClick={toggle} className="hover-tooltip box-icon quickview">
+          <span classNameName="icon icon-view"></span>
+          <span classNameName="tooltip" >
+              Size Guide
+          </span>
+  </div>
+    <Modal isOpen={modal} toggle={toggle}  size="lg" className=' modal-find-size'>
+     
+                <div className="header w-100 px-3 pt-4">
+                    <div className="heading">Size Guide</div>
+                    <span className="icon-close icon-close-popup" onClick={toggle}></span>
+                </div>
+       
+          <ModalBody>
+    <div class="  modalCentered popup-quickadd" id="quickAdd">
+           <div class="modal-content">
+                <div class="tf-rte">
+                    <div class="tf-table-res-df">
+                        <table class="tf-sizeguide-table">
+                            <thead>
+                                <tr>
+                                    <th>Size</th>
+                                    <th>US</th>
+                                    <th>Chest</th>
+                                    <th>Waist</th>
+                                    <th>Hip</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>XS</td>
+                                    <td>2</td>
+                                    <td>32</td>
+                                    <td>24 - 25</td>
+                                    <td>33 - 34</td>
+                                </tr>
+                                <tr>
+                                    <td>S</td>
+                                    <td>4</td>
+                                    <td>34 - 35</td>
+                                    <td>26 - 27</td>
+                                    <td>35 - 26</td>
+                                </tr>
+                                <tr>
+                                    <td>M</td>
+                                    <td>6</td>
+                                    <td>36 - 37</td>
+                                    <td>28 - 29</td>
+                                    <td>38 - 40</td>
+                                </tr>
+                                <tr>
+                                    <td>L</td>
+                                    <td>8</td>
+                                    <td>38 - 29</td>
+                                    <td>30 - 31</td>
+                                    <td>42 - 44</td>
+                                </tr>
+                                <tr>
+                                    <td>XL</td>
+                                    <td>10</td>
+                                    <td>40 - 41</td>
+                                    <td>32 - 33</td>
+                                    <td>45 - 47</td>
+                                </tr>
+                                <tr>
+                                    <td>XXL</td>
+                                    <td>12</td>
+                                    <td>42 - 43</td>
+                                    <td>34 - 35</td>
+                                    <td>48 - 50</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tf-page-size-chart-content">
+                        <div>
+                            <div class="title">Style Measurements:</div>
+                            <ul>
+                                <li class="text">1. Chest</li>
+                                <li class="text-main">Measure at the fullest part of your chest, keeping the tape
+                                    parallel to the floor.</li>
+                                <li class="text">2. Waist</li>
+                                <li class="text-main">Measure at the smallest part of your waist. This is usually below
+                                    the rib cage and above the hip bone.</li>
+                                <li class="text">3. Hip</li>
+                                <li class="text-main">Measure at the fullest part of your seat, keeping the tape
+                                    parallel to the floor.</li>
+                            </ul>
+                        </div>
+                        <div class="text-md-end text-center">
+                            <img class="sizechart ls-is-cached lazyloaded"  src={`${import.meta.env.BASE_URL}/assets/Images/section/size-guide.png`} alt=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+          </ModalBody>
+      </Modal>
+  </>
+  )
+}
+
+export default SizeGuide
