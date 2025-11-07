@@ -228,6 +228,7 @@ const Collection_page = () => {
             <div className="breadcrumb-list">
               <a className="breadcrumb-item" href="index.html">
                 Home
+                
               </a>
               <div className="breadcrumb-item dot">
                 <span></span>
