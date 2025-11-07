@@ -53,6 +53,8 @@ const Header = () => {
   const [openCurrency, setOpenCurrency] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const handleSelect = (language) => setSelectedLanguage(language);
+  const [isShopOpen, setIsShopOpen] = useState(false);
+
 
   const formattedCategories = menuList
     .filter((cat) => cat.ParentCategory === null)
@@ -93,11 +95,22 @@ const Header = () => {
       }),
       procName: "productcategory",
     };
+
     const result = await UseCommonService(OBJ);
+
     if (Array.isArray(result)) {
-      setmenuList(result);
+      // ✅ Show all categories unless ProductCount is explicitly 0
+      const filtered = result.filter(
+        (cat) =>
+          cat?.ProductCount === undefined ||
+          cat?.ProductCount === null ||
+          Number(cat?.ProductCount) > 0
+      );
+
+      setmenuList(filtered);
     }
   };
+
 
   const GoToprofile = () => {
     navigate("/account");
@@ -151,7 +164,11 @@ const Header = () => {
                   </Link>
                 </li>
                 <li className="menu-item">
-                  <a href="#" className="item-link">
+                  <a href="#" className="item-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsShopOpen(!isShopOpen);
+                    }}>
                     Shop<i className="icon icon-arr-down"></i>
                   </a>
                   <div className="sub-menu mega-menu mega-shop">
@@ -180,10 +197,12 @@ const Header = () => {
                                 .map((item, idx) => (
                                   <li key={idx}>
                                     <Link
-                                      to={`/collection/${
-                                        item?.ParentCategory
-                                      }?${"cate"}=${item?.CategoryId}`}
+                                      to={`/collection/${item?.ParentCategory}?cate=${item?.CategoryId}`}
                                       className="menu-link-text link"
+                                      onClick={() => {
+                                        setIsShopOpen(false); // ✅ close dropdown
+                                        window.scrollTo(0, 0); // optional scroll to top
+                                      }}
                                     >
                                       {item.CategoryName}
                                     </Link>
@@ -243,7 +262,7 @@ const Header = () => {
                 </li>
                 <li className="menu-item px-0">
                   <Link to="/contact-us" className="item-link">
-                    Contact US
+                    Contact Us
                   </Link>
                 </li>
                 <li className="menu-item px-0">
@@ -316,9 +335,8 @@ const Header = () => {
           <div className="col-xl-2 col-md-4 col-6 text-xxl-center">
             <Link to="/" className="logo-header">
               <img
-                src={`${import.meta.env.VITE_PUBLIC_COMPANY_LOGO}${
-                  CompanyDetails && CompanyDetails[0]?.CompanyLogo
-                }`}
+                src={`${import.meta.env.VITE_PUBLIC_COMPANY_LOGO}${CompanyDetails && CompanyDetails[0]?.CompanyLogo
+                  }`}
                 alt="logo"
                 className="logo"
               />
@@ -358,9 +376,9 @@ const Header = () => {
                     isLogin
                       ? FetchWishlist()
                       : showAlert(
-                          "Not logged in yet.",
-                          "Login required to access this feature."
-                        );
+                        "Not logged in yet.",
+                        "Login required to access this feature."
+                      );
                   }}
                 >
                   <i className="icon icon-heart"></i>
@@ -591,9 +609,8 @@ const Header = () => {
                       </li>
                       <li className="nav-mb-item">
                         <a
-                          className={`mb-menu-link ${
-                            OpenMenu === 1 ? "" : "collapsed"
-                          }`}
+                          className={`mb-menu-link ${OpenMenu === 1 ? "" : "collapsed"
+                            }`}
                           onClick={() => toggleDropdown(1)}
                           aria-expanded="true"
                           aria-controls="dropdown-menu-shop"
@@ -610,11 +627,10 @@ const Header = () => {
                             {formattedCategories.map((parent, index) => (
                               <li key={parent.CategoryId}>
                                 <div
-                                  className={`sub-nav-link ${
-                                    childMenu === parent.CategoryName
-                                      ? ""
-                                      : "collapsed"
-                                  }`}
+                                  className={`sub-nav-link ${childMenu === parent.CategoryName
+                                    ? ""
+                                    : "collapsed"
+                                    }`}
                                   onClick={() =>
                                     openChildMenu(parent.CategoryName)
                                   }
@@ -638,10 +654,12 @@ const Header = () => {
                                         <Link
                                           to={`/collection/${parent.CategoryName}?cate=${child.CategoryId}`}
                                           className="sub-nav-link"
-                                          onClick={toggleDrawer(false)}
+                                         onClick={() => setOpen(false)} // ✅ instantly closes drawer
+
                                         >
                                           {child.CategoryName}
                                         </Link>
+
                                       </li>
                                     ))}
                                   </ul>
@@ -658,7 +676,7 @@ const Header = () => {
                           aria-expanded="true"
                           aria-controls="dropdown-menu-home"
                         >
-                          <span>Contact US</span>
+                          <span>Contact Us</span>
                         </Link>
                       </li>
                       <li className="nav-mb-item" onClick={toggleDrawer(false)}>
@@ -750,9 +768,8 @@ const Header = () => {
                                   style={{ width: "50px" }}
                                 >
                                   <img
-                                    src={`${
-                                      import.meta.env.BASE_URL
-                                    }/assets/Images/${Currency?.ImgURL}`}
+                                    src={`${import.meta.env.BASE_URL
+                                      }/assets/Images/${Currency?.ImgURL}`}
                                     alt="flag"
                                   />
                                   <span>

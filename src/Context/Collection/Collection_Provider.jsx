@@ -27,6 +27,7 @@ const Collection_Provider = (props) => {
     const FetchCollection = async ()=>{
       setCollectionLoader(true)
         const result = await UseFetchCollection_Product(Payload);
+       
         if(Array.isArray(result)){
           setCollectionData(result);    
           setTotalPage( result[0]?.TotalPages);

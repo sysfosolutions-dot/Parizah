@@ -1,49 +1,66 @@
-import React, { useContext, useEffect, useState } from 'react'
-import {Banner_SliderData} from '../../../Data/Home/HomePageData'
+import React, { useContext } from 'react'
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Link } from 'react-router-dom';
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { Product_Service } from '../../../Services/Product/ProductService';
+import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import ProductContext from '../../../Context/Products';
 
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade"; // 👈 Required for fade effect
+
 const Banner_Container = () => {
-    const {Custom_api_call} = Product_Service();
-    const {bannerData} = useContext(ProductContext);
-    const img_URL = import.meta.env.VITE_PUBLIC_Banner;
+  const { bannerData } = useContext(ProductContext);
+  const img_URL = import.meta.env.VITE_PUBLIC_Banner;
 
   return (
-    <div  className="tf-slideshow slider-fashion-2">
-     <Swiper
-        modules={[Navigation]}
-        spaceBetween={10}
-        observer:true
-        slidesPerView={3}
-        breakpoints={{
-            768: { slidesPerView: 3 },
-            360: { slidesPerView: 1.5 },
+    <div className="container my-4"> 
+      <div className="tf-slideshow slider-fashion-2">
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay, EffectFade]}
+          spaceBetween={10}
+          slidesPerView={1}
+          loop={true}
+          effect="fade"        // 👈 Fade transition
+          speed={1000}         // 👈 Transition duration (1s)
+          autoplay={{
+            delay: 2000,       // 3 sec autoplay
+            disableOnInteraction: false,
           }}
-        loop={true}
+          pagination={{ clickable: true }}
+          navigation={true}
+          className="w-100"
         >
-        {bannerData.map((item, index) => (
+          {bannerData.map((item, index) => (
             <SwiperSlide key={index}>
-              <div className="wg-cls style-abs asp-1 hover-img fs-cls">
-                      <a href={item.link} className="image img-style d-block">
-                                  <img src={img_URL+item.BannerImage} alt={item.Title} loading="lazy" className='h-auto' />
-                        </a>
-                        <div className="content">
-                              <Link  to={`/collection/${item.Title}?cate=${item?.CategoryId}`} className="tf-btn btn-white hover-icon-2 hover-dark">
-                                    {item.Title}
-                                    <i className="icon-arrow-right icon"></i>
-                                </Link>
-                            </div>
-                                        </div>
-                                </SwiperSlide>
-                                ))}
-                              
-                                                    
-                                        </Swiper>
-                                        </div>
-  )
-}
+              <div className="card border-0">
+                <div className="position-relative">
+                  <a href={item.link} className="d-block">
+                    <img
+                      src={img_URL + item.BannerImage}
+                      alt={item.Title}
+                      className="img-fluid w-100"
+                      style={{ height: "500px", objectFit: "cover" }}
+                      loading="lazy"
+                    />
+                  </a>
+                  <div className="card-img-overlay d-flex align-items-end justify-content-center">
+                    <Link
+                      to={`/collection/${item.Title}?cate=${item?.CategoryId}`}
+                      className="btn btn-light px-4 py-2 shadow"
+                    >
+                      {item.Title} <i className="bi bi-arrow-right ms-2"></i>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
+  );
+};
 
-export default Banner_Container
+export default Banner_Container;

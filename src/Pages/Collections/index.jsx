@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useLocation, useParams, useSearchParams, Link, useNavigate,  } from 'react-router-dom';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useLocation, useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import CollectionContext from '../../Context/Collection';
-import { Slider, Typography, Box, Drawer  } from '@mui/material';
+import { Slider, Typography, Box, Drawer } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { Product_Service } from '../../Services/Product/ProductService';
@@ -16,213 +16,206 @@ import { useSweetAlert } from '../../Context/SweetAlert';
 import QuickView_Modal from '../../Components/Common/Modal/QuickView';
 import CollectionFilter from '../../Components/Sekeleton/Collection/CollectionFilter';
 import CardSkeleton from '../../Components/Sekeleton/Collection/CardSkeleton';
+
+
 const Collection_page = () => {
   const img_URL = import.meta.env.VITE_PUBLIC_PRODUCT_IMG;
-  const location = useLocation(); // gives full path like /collection/men/shirts/round-neck
-  const [searchParams, setSearchParam] = useSearchParams(); // for ?color=black etc.
-  const SearchParams = new URLSearchParams(window.location.search); 
-  const navigate = useNavigate()
-  const menuRef = useRef()
-  const {Custom_api_call} = Product_Service();
-  const [pageNo, setpageNo]  = useState(0);
+  const location = useLocation();
+  const [searchParams, setSearchParam] = useSearchParams();
+  const navigate = useNavigate();
+  const menuRef = useRef();
+  const { Custom_api_call } = Product_Service();
+
+  const [pageNo, setpageNo] = useState(0);
   const [ActiveColor, setActiveColor] = useState('');
   const [ActiveSize, setActiveSize] = useState('');
   const [Activebrand, setActiveBrand] = useState('');
   const [ActiveCategoryName, setActiveCategoryName] = useState('');
-  const param = useParams()
-  const {AddToCart} =useContext(ShoppingCartContext);
-  const {Currency, isLogin, filterParentID, setfilterParentID} =useContext(AccountContext);
-  const {fetchData, setfetchdata, sePayload, CollectionData, addto_WishList, RemoveFrom_WishList, TotalPage, WishListData, CollectionLoader, setCollectionLoader} = useContext(CollectionContext);
-  const [CategoryId, setCategoryId] =useState({})
+  const param = useParams();
+  const { AddToCart } = useContext(ShoppingCartContext);
+  const { Currency, isLogin } = useContext(AccountContext);
+  const {
+    fetchData,
+    setfetchdata,
+    sePayload,
+    CollectionData,
+    addto_WishList,
+    RemoveFrom_WishList,
+    TotalPage,
+    WishListData,
+    CollectionLoader,
+  } = useContext(CollectionContext);
+
   const [CategoryList, setCategoryList] = useState([]);
   const [value, setValue] = useState(0);
   const [pricerange, setPriceRange] = useState({ minprice: 0, maxprice: 0 });
-  const [filteredprice, setfilteredprice] = useState({ minprice: 0, maxprice: 0 })
+  const [filteredprice, setfilteredprice] = useState({ minprice: 0, maxprice: 0 });
   const [FilterLoader, setFilterloader] = useState(false);
-  const [BrandList, setBrandList] =useState([]);
+  const [BrandList, setBrandList] = useState([]);
   const [ColorList, setColorList] = useState([]);
   const [SizeList, setSizeList] = useState([]);
-  const [OpenFilterDrawer, setopenFilterDrawer] = useState(false)
+  const [OpenFilterDrawer, setopenFilterDrawer] = useState(false);
   const [isChecked, setisChecked] = useState(searchParams.get("cate"));
   const [isBrandChecked, setisBrandChecked] = useState(searchParams.get("brand"));
-  const [expanddrop_down, setexpanddrop_down]  = useState(false);
-  const [SortValue, setSortValue] = useState({showValue:'Best selling', Value:'Priority'})
-  const [ClientID, setClientID] = useState(localStorage.getItem('ClientId') || '0');
-  const [Grid, setGrid] = useState('tf-col-3');
-  const {showAlert} = useSweetAlert()
+  const [expanddrop_down, setexpanddrop_down] = useState(false);
+  const [SortValue, setSortValue] = useState({ showValue: 'Best selling', Value: 'Priority' });
+  const [ClientID] = useState(localStorage.getItem('ClientId') || '0');
+  const { showAlert } = useSweetAlert();
   const isMobile = window.innerWidth <= 768;
+  const [Grid, setGrid] = useState('tf-col-3');
   const [activeImage, setActiveImage] = useState(null);
   const [activeColorIndex, setActiveColorIndex] = useState(0);
 
   const handleSwatchHover = (imgSrc, index) => {
-    console.log(imgSrc, index);
-    
     setActiveImage(imgSrc);
     setActiveColorIndex(index);
   };
 
-
-
-  useEffect(()=>{
-    if(isMobile){
-      setGrid('tf-col-2')
-    }
-  },[])
-
-
-  // Fetching Collection Category 
-  const  FetchCollection_Filter = async()=>{
-    setFilterloader(true)
-        let CatgoryID  = searchParams.get('cate');
-          const CategoyValues = Array.from(searchParams.entries());
-      if (CategoyValues.length > 0) {
-      const [firstKey, firstValue] = CategoyValues[0];
-        CatgoryID = firstValue
-    }
-      
-    const OBJ ={
-        Para :JSON.stringify({CategoryId:CatgoryID , ActionMode:'ProductFilter'}),
-        procName : "ProductFilter "
-    }
-    const result = await Custom_api_call(OBJ);
-    if(Array.isArray(result)){
-        setCategoryList(JSON.parse(result[0]?.CategoryFilter));
-        setBrandList(JSON.parse(result[0]?.Brand));
-        const colors = new Set();
-        const sizes = new Set(); 
-        const variations = JSON.parse(result[0]?.ProductVariation); // parse to JS object
-        if(variations){
-           variations.forEach((obj) => {
-        const variationStr = obj.ProductVariation;
-        const parts = variationStr.split(",");
-        parts.forEach((part) => {
-        const [keyRaw, valueRaw] = part.split(":");
-        if (!keyRaw || !valueRaw) return;
-          const key = keyRaw.trim().toLowerCase();
-          const value = valueRaw.trim();
-            if (key === "color") colors.add(value);
-            if (key === "size") sizes.add(value);
-              setFilterloader(false)
-  });
-    setPriceRange({ minprice:Math.round(Number(result[0]?.MinPrice)), maxprice:Math.round(Number(result[0]?.MaxPrice)) })
-    setValue([Math.round(Number(result[0]?.MinPrice)), Math.round(Number(result[0]?.MaxPrice))])
-});
-  let uniqueSizes = Array.from(sizes)
-  uniqueSizes = Array.from(
-  new Map(uniqueSizes.map(itm => [itm.toLowerCase(), itm])).values()
-);
-  
-  setColorList(Array.from(colors))
-  setSizeList(uniqueSizes)
-        }else{
-              setColorList([])
-              setSizeList([])
-        }
-
-
-
-    }
-
-  }
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setexpanddrop_down(false);
-    }
-  };
-
-    const handleChange = (event, newValue) => {      
-      //console.log('running'); 
-      setValue(newValue);
-  };
-
-  const handleSliderCommit = (event, newValue)=>{
-    // //console.log(event, newValue);
-    setfilteredprice({ minprice:newValue[0], maxprice: newValue[1] })
-  }
-
-
-
-
-    useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
+  useEffect(() => {
+    if (isMobile) setGrid('tf-col-2');
   }, []);
 
-// render Card Size
+  // ✅ Fetch filters (brands, colors, sizes)
+  
+  // ✅ Fetch filters (brands, colors, sizes)
+  const FetchCollection_Filter = async () => {
+    try {
+      setFilterloader(true);
+      let CatgoryID = searchParams.get('cate');
+      const CategoyValues = Array.from(searchParams.entries());
+      if (CategoyValues.length > 0) {
+        const [firstKey, firstValue] = CategoyValues[0];
+        CatgoryID = firstValue;
+      }
 
-const RenderCardSize =(data)=>{
-    const modifiedData = JSON.parse(data)
-    //console.log(modifiedData, 'running');
-    
-    return modifiedData
-}
+      const OBJ = {
+        Para: JSON.stringify({ CategoryId: CatgoryID, ActionMode: 'ProductFilter' }),
+        procName: 'ProductFilter ',
+      };
+      const result = await Custom_api_call(OBJ);
+      if (Array.isArray(result)) {
+        // ✅ Filter out categories with ProductCount = 0
+        const allCategories = JSON.parse(result[0]?.CategoryFilter || '[]');
+        const filteredCategories = allCategories.filter(cat => Number(cat?.ProductCount) > 0);
+        setCategoryList(filteredCategories);
 
-const handleChangePage = (event, newPage) => {        
-        setpageNo(newPage - 1)
+        setBrandList(JSON.parse(result[0]?.Brand || '[]'));
+
+        const colors = new Set();
+        const sizes = new Set();
+        const variations = JSON.parse(result[0]?.ProductVariation || '[]');
+        variations.forEach((obj) => {
+          const parts = obj.ProductVariation.split(',');
+          parts.forEach((part) => {
+            const [keyRaw, valueRaw] = part.split(':');
+            if (!keyRaw || !valueRaw) return;
+            const key = keyRaw.trim().toLowerCase();
+            const value = valueRaw.trim();
+            if (key === 'color') colors.add(value);
+            if (key === 'size') sizes.add(value);
+          });
+        });
+
+        setColorList(Array.from(colors));
+        const uniqueSizes = Array.from(
+          new Map(Array.from(sizes).map((itm) => [itm.toLowerCase(), itm])).values()
+        );
+        setSizeList(uniqueSizes);
+        setPriceRange({
+          minprice: Math.round(Number(result[0]?.MinPrice || 0)),
+          maxprice: Math.round(Number(result[0]?.MaxPrice || 1000)),
+        });
+        setValue([
+          Math.round(Number(result[0]?.MinPrice || 0)),
+          Math.round(Number(result[0]?.MaxPrice || 1000)),
+        ]);
+      }
+    } finally {
+      setFilterloader(false);
+    }
   };
 
-const ApplyFilters = (str, VALUE) => {
-  setpageNo(0);
-  const searchParams = new URLSearchParams(window.location.search);
-  const currentValue = searchParams.get(str);
-  if (currentValue === String(VALUE)) {
-    searchParams.delete(str);
-    if (str === "color") setActiveColor('');
-    if (str === "size") setActiveSize('');
-    if (str === "brand") setActiveBrand('');
-    if (str === "cate") setActiveCategoryName('');
-  } else {
-    searchParams.set(str, VALUE); // pehle delete + append ki jagah direct set
-    if (str === "color") setActiveColor(VALUE);
-    if (str === "size") setActiveSize(VALUE);
-    if (str === "brand") setActiveBrand(VALUE);
-    if (str === "cate") setActiveCategoryName(VALUE);
-  }
 
-  setSearchParam(searchParams); // ✅ new instance pass ho raha hai
-};
+  const handleChange = (e, newValue) => setValue(newValue);
+  const handleSliderCommit = (e, newValue) => setfilteredprice({ minprice: newValue[0], maxprice: newValue[1] });
 
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) setexpanddrop_down(false);
+  };
 
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
-    useEffect(()=>{
-      const searchParams = new URLSearchParams(window.location.search); 
-      const COLOR = searchParams.get('color');
-      const SIZE = searchParams.get('size');
-      const BRAND  = searchParams.get('brand');
-      let CatgoryID  = searchParams.get('cate');
-      //console.log(BRAND,COLOR, SIZE, CatgoryID);
-      const Brand =  BrandList.filter((itm)=> itm?.BrandName === searchParams.get('brand'));      
-      setActiveColor(COLOR);
-      setActiveSize(SIZE);
-      setActiveBrand(BRAND)
-      const CategoyValues = Array.from(searchParams.entries());
-  if (CategoyValues.length > 0) {
-      const [firstKey, firstValue] = CategoyValues[0];
-        CatgoryID = firstValue;
-        setCategoryId({[firstKey]:firstValue})
+  const handleChangePage = (event, newPage) => setpageNo(newPage - 1);
+
+  const ApplyFilters = (str, VALUE) => {
+    setpageNo(0);
+    const searchParams = new URLSearchParams(window.location.search);
+    const currentValue = searchParams.get(str);
+    if (currentValue === String(VALUE)) {
+      searchParams.delete(str);
+      if (str === 'color') setActiveColor('');
+      if (str === 'size') setActiveSize('');
+      if (str === 'brand') setActiveBrand('');
+      if (str === 'cate') setActiveCategoryName('');
+    } else {
+      searchParams.set(str, VALUE);
+      if (str === 'color') setActiveColor(VALUE);
+      if (str === 'size') setActiveSize(VALUE);
+      if (str === 'brand') setActiveBrand(VALUE);
+      if (str === 'cate') setActiveCategoryName(VALUE);
     }
-      
-        const CookieID = Cookies.get("user_id");
-        if(CatgoryID){
-            setfetchdata(!fetchData);
-            sePayload({ClientId:ClientID, BrandId : Brand[0]?.BrandId, MinPrice:filteredprice?.minprice || 0, MaxPrice :filteredprice?.maxprice || 0, Color:COLOR || '', Size:SIZE || '', FilterCategoryId: '0', CategoryId : CatgoryID || ActiveCategoryName?.CategoryId,  CookieId:CookieID, FilterBy :SortValue?.Value,  Pagination :pageNo, ProductName : ""})
-        }
-    }, [location, pageNo, SortValue, filteredprice]);
+    setSearchParam(searchParams);
+  };
 
-    useEffect(()=>{
-        FetchCollection_Filter()
-    }, [])
+  // ✅ SOFT REFRESH — fetch new data when category changes
+  const [lastCategory, setLastCategory] = useState(null);
+  useEffect(() => {
+    const category = searchParams.get('cate');
+    if (category && category !== lastCategory) {
+      setLastCategory(category);
+      FetchCollection_Filter();
+      setfetchdata((prev) => !prev); // re-fetch products
+    }
+  }, [searchParams]);
 
+  // ✅ Fetch product data (no reloads)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const COLOR = searchParams.get('color');
+    const SIZE = searchParams.get('size');
+    const BRAND = searchParams.get('brand');
+    const CatgoryID = searchParams.get('cate');
+    const Brand = BrandList.find((itm) => itm?.BrandName === BRAND);
+    setActiveColor(COLOR);
+    setActiveSize(SIZE);
+    setActiveBrand(BRAND);
+
+    const CookieID = Cookies.get('user_id');
+    if (CatgoryID) {
+      setfetchdata(!fetchData);
+      sePayload({
+        ClientId: ClientID,
+        BrandId: Brand?.BrandId,
+        MinPrice: filteredprice?.minprice || 0,
+        MaxPrice: filteredprice?.maxprice || 0,
+        Color: COLOR || '',
+        Size: SIZE || '',
+        FilterCategoryId: '0',
+        CategoryId: CatgoryID,
+        CookieId: CookieID,
+        FilterBy: SortValue?.Value,
+        Pagination: pageNo,
+        ProductName: '',
+      });
+    }
+  }, [location, pageNo, SortValue, filteredprice]);
+
+  useEffect(() => {
+    FetchCollection_Filter();
+  }, []);
 
 
   return (
@@ -268,7 +261,7 @@ const ApplyFilters = (str, VALUE) => {
                     <span className="icon-close icon-close-popup close-filter"></span>
                   </div>
                   {FilterLoader ? <>
-                    <CollectionFilter/>
+                    <CollectionFilter />
                   </> : <div className="canvas-body">
                     <div className="widget-facet">
                       <div
@@ -283,15 +276,15 @@ const ApplyFilters = (str, VALUE) => {
                         <span className="icon icon-arrow-up"></span>
                       </div>
                       <div id="availability" className="collapse show">
-                          <span className="reset-link text-decoration-underline" onClick={()=> {
-                              const newParams = new URLSearchParams(window.location.search);
-                              newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
-                              setSearchParam(newParams);
-                              setisChecked('')
-                          }}>Reset</span>
+                        <span className="reset-link text-decoration-underline" onClick={() => {
+                          const newParams = new URLSearchParams(window.location.search);
+                          newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
+                          setSearchParam(newParams);
+                          setisChecked('')
+                        }}>Reset</span>
                         <ul className="collapse-body filter-group-check current-scrollbar">
                           {CategoryList &&
-                            CategoryList.map((itm, idx) => {                              
+                            CategoryList.map((itm, idx) => {
                               return (
                                 <li className="list-item" key={idx}>
                                   <input
@@ -302,7 +295,7 @@ const ApplyFilters = (str, VALUE) => {
                                     id={itm?.FilterCategoryId}
                                     onChange={() => {
                                       ApplyFilters("cate", itm?.FilterCategoryId);
-                                       setisChecked(String(itm?.FilterCategoryId));
+                                      setisChecked(String(itm?.FilterCategoryId));
                                     }
                                     }
                                   />
@@ -379,9 +372,8 @@ const ApplyFilters = (str, VALUE) => {
                         <div className="collapse-body filter-color-box flat-check-list">
                           {ColorList.map((item, idx) => (
                             <div
-                              className={`${
-                                ActiveColor === item ? "active" : ""
-                              } check-item color-item color-check `}
+                              className={`${ActiveColor === item ? "active" : ""
+                                } check-item color-item color-check `}
                               key={idx}
                               onClick={() => ApplyFilters("color", item)}
                             >
@@ -414,12 +406,11 @@ const ApplyFilters = (str, VALUE) => {
                         <div className="collapse-body filter-size-box flat-check-list">
                           {SizeList.map((itm, idx) => (
                             <div
-                              className={`${
-                                ActiveSize &&
-                                ActiveSize.toLowerCase() === itm.toLowerCase()
+                              className={`${ActiveSize &&
+                                  ActiveSize.toLowerCase() === itm.toLowerCase()
                                   ? "active"
                                   : ""
-                              } check-item size-item size-check`}
+                                } check-item size-item size-check`}
                               key={idx}
                               onClick={() => ApplyFilters("size", itm)}
                             >
@@ -444,13 +435,13 @@ const ApplyFilters = (str, VALUE) => {
                         <span className="icon icon-arrow-up"></span>
                       </div>
                       <div id="brand" className="collapse show">
-                        <span className="reset-link text-decoration-underline" onClick={()=> {
-                              const newParams = new URLSearchParams(window.location.search);
-                              newParams.delete('brand')
-                              newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
-                              setSearchParam(newParams);
-                              setisBrandChecked('')
-                          }}>Reset</span>
+                        <span className="reset-link text-decoration-underline" onClick={() => {
+                          const newParams = new URLSearchParams(window.location.search);
+                          newParams.delete('brand')
+                          newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
+                          setSearchParam(newParams);
+                          setisBrandChecked('')
+                        }}>Reset</span>
                         <ul className="collapse-body filter-group-check current-scrollbar">
                           {BrandList?.map((itm, idx) => (
                             <li className="list-item" key={idx}>
@@ -464,7 +455,7 @@ const ApplyFilters = (str, VALUE) => {
                               <label
                                 htmlFor={idx}
                                 className="label"
-                                onClick={() =>{
+                                onClick={() => {
                                   ApplyFilters("brand", itm?.BrandName);
                                   setisBrandChecked(String(itm?.BrandName));
                                 }
@@ -490,16 +481,15 @@ const ApplyFilters = (str, VALUE) => {
                   <button
                     id="filterShop"
                     className="tf-btn-filter d-flex d-xl-none"
-                    onClick={()=> setopenFilterDrawer(true)}
+                    onClick={() => setopenFilterDrawer(true)}
                   >
                     <span className="icon icon-filter"></span>
                     <span className="text">Filter</span>
                   </button>
                   <div
                     ref={menuRef}
-                    className={`tf-dropdown-sort position-relative ${
-                      expanddrop_down ? "show" : ""
-                    }`}
+                    className={`tf-dropdown-sort position-relative ${expanddrop_down ? "show" : ""
+                      }`}
                     onClick={() => setexpanddrop_down(!expanddrop_down)}
                     data-bs-toggle="dropdown"
                     aria-expanded={true}
@@ -511,9 +501,8 @@ const ApplyFilters = (str, VALUE) => {
                       <span className="icon icon-arr-down"></span>
                     </div>
                     <div
-                      className={`dropdown-menu  collection-filter ${
-                        expanddrop_down ? "show" : ""
-                      }`}
+                      className={`dropdown-menu  collection-filter ${expanddrop_down ? "show" : ""
+                        }`}
                       data-popper-placement="bottom-start"
                     >
                       <div
@@ -577,9 +566,8 @@ const ApplyFilters = (str, VALUE) => {
                 </div>
                 <ul className="tf-control-layout">
                   <li
-                    className={`tf-view-layout-switch sw-layout-list list-layout ${
-                      Grid === "list" ? "active" : ""
-                    }`}
+                    className={`tf-view-layout-switch sw-layout-list list-layout ${Grid === "list" ? "active" : ""
+                      }`}
                     onClick={() => setGrid("list")}
                   >
                     <div className="item icon-list">
@@ -588,9 +576,8 @@ const ApplyFilters = (str, VALUE) => {
                     </div>
                   </li>
                   <li
-                    className={`tf-view-layout-switch sw-layout-2 ${
-                      Grid === "tf-col-2" ? "active" : ""
-                    }`}
+                    className={`tf-view-layout-switch sw-layout-2 ${Grid === "tf-col-2" ? "active" : ""
+                      }`}
                     onClick={() => setGrid("tf-col-2")}
                   >
                     <div className="item icon-grid-2">
@@ -599,9 +586,8 @@ const ApplyFilters = (str, VALUE) => {
                     </div>
                   </li>
                   <li
-                    className={`tf-view-layout-switch sw-layout-3 ${
-                      Grid === "tf-col-3" ? "active" : ""
-                    }`}
+                    className={`tf-view-layout-switch sw-layout-3 ${Grid === "tf-col-3" ? "active" : ""
+                      }`}
                     onClick={() => setGrid("tf-col-3")}
                   >
                     <div className="item icon-grid-3">
@@ -611,9 +597,8 @@ const ApplyFilters = (str, VALUE) => {
                     </div>
                   </li>
                   <li
-                    className={`tf-view-layout-switch sw-layout-4 ${
-                      Grid === "tf-col-4" ? "active" : ""
-                    }`}
+                    className={`tf-view-layout-switch sw-layout-4 ${Grid === "tf-col-4" ? "active" : ""
+                      }`}
                     onClick={() => setGrid("tf-col-4")}
                   >
                     <div className="item icon-grid-4">
@@ -642,18 +627,23 @@ const ApplyFilters = (str, VALUE) => {
                             to={`/product/${itm?.CategoryName.replace(/ /g, "-")}/${itm?.ProductId}/${itm?.PVDId}`}
                             className="product-img"
                           >
+                           
                             <img
                               className="img-product lazyload"
-                              data-src={activeColorIndex === index ? `${import.meta.env.VITE_PUBLIC_PRODUCT_IMG}${activeImage}` : `${img_URL}/${itm?.ProductImage}`}
-                              src={`${img_URL}/${itm?.ProductImage}`}
-                              alt="image-product"
+                              src={`${img_URL}/${ itm?.ProductImage}`}
+                              alt={itm?.ProductName || "product image"}
+                              loading="lazy"
                             />
-                            <img
-                              className="img-hover lazyload"
-                              data-src={`${img_URL}/${itm?.ProductImage}`}
-                              src={`${img_URL}/${itm?.ProductImage}`}
-                              alt="image-product"
-                            />
+
+                           
+                            {itm?.HoverImage && itm?.HoverImage !== itm?.ProductImage ? (
+                              <img
+                                className="img-hover lazyload"
+                                src={`${img_URL}/${itm?.HoverImage}`}
+                                alt={`${itm?.ProductName || "product image"} hover`}
+                                loading="lazy"
+                              />
+                            ) : null}
                           </Link>
                           <ul className="list-product-btn">
                             <li>
@@ -664,13 +654,13 @@ const ApplyFilters = (str, VALUE) => {
                                 onClick={() => {
                                   isLogin && itm?.Wishlisted === "0"
                                     ? addto_WishList({
-                                        ProductId: itm?.ProductId,
-                                        PVDId: itm?.ProductVariantDetailId,
-                                        ListType: "Collection",
-                                      })
+                                      ProductId: itm?.ProductId,
+                                      PVDId: itm?.ProductVariantDetailId,
+                                      ListType: "Collection",
+                                    })
                                     : isLogin && itm?.Wishlisted != "0"
-                                    ? RemoveFrom_WishList(itm?.Wishlisted)
-                                    : showAlert(
+                                      ? RemoveFrom_WishList(itm?.Wishlisted)
+                                      : showAlert(
                                         "Not logged in yet.",
                                         "Login required to access this feature."
                                       );
@@ -792,13 +782,13 @@ const ApplyFilters = (str, VALUE) => {
                               onClick={() => {
                                 isLogin && itm?.Wishlisted === "0"
                                   ? addto_WishList({
-                                      ProductId: itm?.ProductId,
-                                      PVDId: itm?.ProductVariantDetailId,
-                                      ListType: "Collection",
-                                    })
+                                    ProductId: itm?.ProductId,
+                                    PVDId: itm?.ProductVariantDetailId,
+                                    ListType: "Collection",
+                                  })
                                   : isLogin && itm?.Wishlisted != "0"
-                                  ? RemoveFrom_WishList(itm?.Wishlisted)
-                                  : showAlert(
+                                    ? RemoveFrom_WishList(itm?.Wishlisted)
+                                    : showAlert(
                                       "Not logged in yet.",
                                       "Login required to access this feature."
                                     );
@@ -839,12 +829,11 @@ const ApplyFilters = (str, VALUE) => {
                 )}
               </div>
               <div
-                className={`wrapper-shop tf-grid-layout ${
-                  Grid === "list" ? "d-none" : Grid
-                }`}
+                className={`wrapper-shop tf-grid-layout ${Grid === "list" ? "d-none" : Grid
+                  }`}
               >
                 {CollectionLoader ? (<>
-                  <CardSkeleton/>
+                  <CardSkeleton />
                 </>) : !CollectionLoader && CollectionData.length > 0 ? (
                   <>
                     {CollectionData.map((itm, idxx) => (
@@ -859,10 +848,16 @@ const ApplyFilters = (str, VALUE) => {
                             to={`/product/${itm?.CategoryName.replace(/ /g, "-")}/${itm?.ProductId}/${itm?.PVDId}`}
                             className="product-img"
                           >
-                            <img
+                            {/* <img
                               className="img-product lazyload"
                               data-src={activeColorIndex === idxx ? `${import.meta.env.VITE_PUBLIC_PRODUCT_IMG}${activeImage}` : `${img_URL}/${itm?.ProductImage}`}
                               src={activeColorIndex === idxx ? `${import.meta.env.VITE_PUBLIC_PRODUCT_IMG}${activeImage}` : `${img_URL}/${itm?.ProductImage}`}
+                              alt="image-product"
+                            /> */}
+                               <img
+                              className="img-product lazyload"
+                              data-src={`${img_URL}/${itm?.ProductImage}`}
+                              src={`${img_URL}/${itm?.ProductImage}`}
                               alt="image-product"
                             />
                             <img
@@ -881,13 +876,13 @@ const ApplyFilters = (str, VALUE) => {
                                 onClick={() => {
                                   isLogin && itm?.Wishlisted === "0"
                                     ? addto_WishList({
-                                        ProductId: itm?.ProductId,
-                                        PVDId: itm?.ProductVariantDetailId,
-                                        ListType: "Collection",
-                                      })
+                                      ProductId: itm?.ProductId,
+                                      PVDId: itm?.ProductVariantDetailId,
+                                      ListType: "Collection",
+                                    })
                                     : isLogin && itm?.Wishlisted != "0"
-                                    ? RemoveFrom_WishList(itm?.Wishlisted)
-                                    : showAlert(
+                                      ? RemoveFrom_WishList(itm?.Wishlisted)
+                                      : showAlert(
                                         "Not logged in yet.",
                                         "Login required to access this feature."
                                       );
@@ -955,8 +950,8 @@ const ApplyFilters = (str, VALUE) => {
                                 <li
                                   key={idx}
                                   className="list-color-item color-swatch hover-tooltip tooltip-bot active"
-                                   onMouseOver={() => handleSwatchHover(ColorObj.imagepath, idxx)}
-                                    onClick={() => handleSwatchHover(ColorObj.imagepath, idxx)}
+                                  onMouseOver={() => handleSwatchHover(ColorObj.imagepath, idxx)}
+                                  onClick={() => handleSwatchHover(ColorObj.imagepath, idxx)}
                                 >
                                   <span className="tooltip color-filter">
                                     {ColorObj?.Name.replace("Color:", "")}
@@ -983,9 +978,9 @@ const ApplyFilters = (str, VALUE) => {
                     ))}
                   </>
                 ) : (<>
-                  <Page_NotFound/>
+                  <Page_NotFound />
                 </>)
-                
+
                 }
               </div>
               <div className="wg-pagination mt-5">
@@ -1020,231 +1015,229 @@ const ApplyFilters = (str, VALUE) => {
           </div>
         </div>
       </section>
-       <Drawer anchor="left" 
-              slotProps={{
-                  paper: {
-                    className: ' offcanvas-end popup-style-1 popup-login'
-                  }
-                }}
-              open={OpenFilterDrawer} onClose={()=> setopenFilterDrawer(false)}>
-                 <div className="canvas-header popup-header">
-            <span className="title">Filter</span>
-            <button className="icon-close icon-close-popup bg-transparent border-0 text-dark"  aria-label="Close" onClick={()=> setopenFilterDrawer(false)}></button>
+      <Drawer anchor="left"
+        slotProps={{
+          paper: {
+            className: ' offcanvas-end popup-style-1 popup-login'
+          }
+        }}
+        open={OpenFilterDrawer} onClose={() => setopenFilterDrawer(false)}>
+        <div className="canvas-header popup-header">
+          <span className="title">Filter</span>
+          <button className="icon-close icon-close-popup bg-transparent border-0 text-dark" aria-label="Close" onClick={() => setopenFilterDrawer(false)}></button>
         </div>
-               <Box className="canvas-wrapper">
-                  <div className="canvas-body">
-                    <div className="widget-facet">
-                      <div
-                        className="facet-title text-xl fw-medium"
-                        data-bs-target="#availability"
-                        role="button"
-                        data-bs-toggle="collapse"
-                        aria-expanded="true"
-                        aria-controls="availability"
-                      >
-                        <span>Collections</span>
-                        <span className="icon icon-arrow-up"></span>
-                      </div>
-                      <div id="availability" className="collapse show">
-                          <span className="reset-link text-decoration-underline" onClick={()=> {
-                              const newParams = new URLSearchParams(window.location.search);
-                              newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
-                              setSearchParam(newParams);
-                              setisChecked('')
-                          }}>Reset</span>
-                        <ul className="collapse-body filter-group-check current-scrollbar mt-4">
-                          {CategoryList &&
-                            CategoryList.map((itm, idx) => {                              
-                              return (
-                                <li className="list-item" key={idx}>
-                                  <input
-                                    type="radio"
-                                    name="availability"
-                                    className="tf-check"
-                                    checked={isChecked === String(itm?.FilterCategoryId)}
-                                    id={itm?.FilterCategoryId}
-                                    onChange={() => {
-                                      ApplyFilters("cate", itm?.FilterCategoryId);
-                                       setisChecked(String(itm?.FilterCategoryId));
-                                    }
-                                    }
-                                  />
-                                  <label
-                                    htmlFor={itm?.FilterCategoryId}
-                                    className="label"
-                                  >
-                                    <span>{itm?.CategoryName}</span>&nbsp;
-                                    <span className="count">
-                                      ({itm?.ProductCount})
-                                    </span>
-                                  </label>
-                                </li>
-                              );
-                            })}
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="widget-facet">
-                      <div
-                        className="facet-title text-xl fw-medium"
-                        data-bs-target="#price"
-                        role="button"
-                        data-bs-toggle="collapse"
-                        aria-expanded="true"
-                        aria-controls="price"
-                      >
-                        <span>Price</span>
-                        <span className="icon icon-arrow-up"></span>
-                      </div>
-                      <div id="price" className="collapse show">
-                        <div className="collapse-body widget-price filter-price show">
-                          <span className="reset-price">Reset</span>
-                          <div
-                            className="price-val-range"
-                            id="price-value-range"
-                            data-min="0"
-                            data-max="500"
-                          ></div>
-                          <div className="box-value-price">
-                            <Box width={300} mx="auto">
-                              <Slider
-                                value={value}
-                                onChange={handleChange}
-                                onChangeCommitted={handleSliderCommit}
-                                valueLabelDisplay="auto"
-                                min={pricerange?.minprice}
-                                max={pricerange?.maxprice}
-                                sx={{
-                                  color: "#ff6f61", // slider color
-                                }}
-                              />
-                              <Typography gutterBottom>
-                                Price Range: ₹{value[0]} - ₹{value[1]}
-                              </Typography>
-                            </Box>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="widget-facet">
-                      <div
-                        className="facet-title text-xl fw-medium"
-                        data-bs-target="#color"
-                        role="button"
-                        data-bs-toggle="collapse"
-                        aria-expanded="true"
-                        aria-controls="color"
-                      >
-                        <span>Color</span>
-                        <span className="icon icon-arrow-up"></span>
-                      </div>
-                      <div id="color" className="collapse show">
-                        <div className="collapse-body filter-color-box flat-check-list">
-                          {ColorList.map((item, idx) => (
-                            <div
-                              className={`${
-                                ActiveColor === item ? "active" : ""
-                              } check-item color-item color-check `}
-                              key={idx}
-                              onClick={() => ApplyFilters("color", item)}
-                            >
-                              <span
-                                className="color"
-                                style={{
-                                  background: item,
-                                  border: "1px solid #cac5c5",
-                                }}
-                              ></span>
-                              <span className="color-text">{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="widget-facet">
-                      <div
-                        className="facet-title text-xl fw-medium"
-                        data-bs-target="#size"
-                        role="button"
-                        data-bs-toggle="collapse"
-                        aria-expanded="true"
-                        aria-controls="size"
-                      >
-                        <span>Size</span>
-                        <span className="icon icon-arrow-up"></span>
-                      </div>
-                      <div id="size" className="collapse show">
-                        <div className="collapse-body filter-size-box flat-check-list">
-                          {SizeList.map((itm, idx) => (
-                            <div
-                              className={`${
-                                ActiveSize &&
-                                ActiveSize.toLowerCase() === itm.toLowerCase()
-                                  ? "active"
-                                  : ""
-                              } check-item size-item size-check`}
-                              key={idx}
-                              onClick={() => ApplyFilters("size", itm)}
-                            >
-                              <span className="size text-uppercase">{itm}</span>
-                              &nbsp;
-                              {/* <span className="count">(10)</span> */}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="widget-facet">
-                      <div
-                        className="facet-title text-xl fw-medium"
-                        data-bs-target="#brand"
-                        role="button"
-                        data-bs-toggle="collapse"
-                        aria-expanded="true"
-                        aria-controls="brand"
-                      >
-                        <span>Brand</span>
-                        <span className="icon icon-arrow-up"></span>
-                      </div>
-                      <div id="brand" className="collapse show">
-                        <span className="reset-link text-decoration-underline" onClick={()=> {
-                              const newParams = new URLSearchParams(window.location.search);
-                              newParams.delete('brand')
-                              newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
-                              setSearchParam(newParams);
-                              setisBrandChecked('')
-                          }}>Reset</span>
-                        <ul className="collapse-body filter-group-check current-scrollbar mt-4">
-                          {BrandList?.map((itm, idx) => (
-                            <li className="list-item" key={idx}>
-                              <input
-                                type="radio"
-                                name="brand"
-                                checked={isBrandChecked == itm?.BrandName}
-                                className="tf-check"
-                                id={idx}
-                              />
-                              <label
-                                htmlFor={idx}
-                                className="label"
-                                onClick={() =>{
-                                  ApplyFilters("brand", itm?.BrandName);
-                                  setisBrandChecked(String(itm?.BrandName));
-                                }
-                                }
-                              >
-                                <span>{itm?.BrandName}</span>&nbsp;
-                                <span className="count">
-                                  ({itm?.BrandCount})
-                                </span>
-                              </label>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
+        <Box className="canvas-wrapper">
+          <div className="canvas-body">
+            <div className="widget-facet">
+              <div
+                className="facet-title text-xl fw-medium"
+                data-bs-target="#availability"
+                role="button"
+                data-bs-toggle="collapse"
+                aria-expanded="true"
+                aria-controls="availability"
+              >
+                <span>Collections</span>
+                <span className="icon icon-arrow-up"></span>
+              </div>
+              <div id="availability" className="collapse show">
+                <span className="reset-link text-decoration-underline" onClick={() => {
+                  const newParams = new URLSearchParams(window.location.search);
+                  newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
+                  setSearchParam(newParams);
+                  setisChecked('')
+                }}>Reset</span>
+                <ul className="collapse-body filter-group-check current-scrollbar mt-4">
+                  {CategoryList &&
+                    CategoryList.map((itm, idx) => {
+                      return (
+                        <li className="list-item" key={idx}>
+                          <input
+                            type="radio"
+                            name="availability"
+                            className="tf-check"
+                            checked={isChecked === String(itm?.FilterCategoryId)}
+                            id={itm?.FilterCategoryId}
+                            onChange={() => {
+                              ApplyFilters("cate", itm?.FilterCategoryId);
+                              setisChecked(String(itm?.FilterCategoryId));
+                            }
+                            }
+                          />
+                          <label
+                            htmlFor={itm?.FilterCategoryId}
+                            className="label"
+                          >
+                            <span>{itm?.CategoryName}</span>&nbsp;
+                            <span className="count">
+                              ({itm?.ProductCount})
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </div>
+            </div>
+            <div className="widget-facet">
+              <div
+                className="facet-title text-xl fw-medium"
+                data-bs-target="#price"
+                role="button"
+                data-bs-toggle="collapse"
+                aria-expanded="true"
+                aria-controls="price"
+              >
+                <span>Price</span>
+                <span className="icon icon-arrow-up"></span>
+              </div>
+              <div id="price" className="collapse show">
+                <div className="collapse-body widget-price filter-price show">
+                  <span className="reset-price">Reset</span>
+                  <div
+                    className="price-val-range"
+                    id="price-value-range"
+                    data-min="0"
+                    data-max="500"
+                  ></div>
+                  <div className="box-value-price">
+                    <Box width={300} mx="auto">
+                      <Slider
+                        value={value}
+                        onChange={handleChange}
+                        onChangeCommitted={handleSliderCommit}
+                        valueLabelDisplay="auto"
+                        min={pricerange?.minprice}
+                        max={pricerange?.maxprice}
+                        sx={{
+                          color: "#ff6f61", // slider color
+                        }}
+                      />
+                      <Typography gutterBottom>
+                        Price Range: ₹{value[0]} - ₹{value[1]}
+                      </Typography>
+                    </Box>
                   </div>
-              </Box>
+                </div>
+              </div>
+            </div>
+            <div className="widget-facet">
+              <div
+                className="facet-title text-xl fw-medium"
+                data-bs-target="#color"
+                role="button"
+                data-bs-toggle="collapse"
+                aria-expanded="true"
+                aria-controls="color"
+              >
+                <span>Color</span>
+                <span className="icon icon-arrow-up"></span>
+              </div>
+              <div id="color" className="collapse show">
+                <div className="collapse-body filter-color-box flat-check-list">
+                  {ColorList.map((item, idx) => (
+                    <div
+                      className={`${ActiveColor === item ? "active" : ""
+                        } check-item color-item color-check `}
+                      key={idx}
+                      onClick={() => ApplyFilters("color", item)}
+                    >
+                      <span
+                        className="color"
+                        style={{
+                          background: item,
+                          border: "1px solid #cac5c5",
+                        }}
+                      ></span>
+                      <span className="color-text">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="widget-facet">
+              <div
+                className="facet-title text-xl fw-medium"
+                data-bs-target="#size"
+                role="button"
+                data-bs-toggle="collapse"
+                aria-expanded="true"
+                aria-controls="size"
+              >
+                <span>Size</span>
+                <span className="icon icon-arrow-up"></span>
+              </div>
+              <div id="size" className="collapse show">
+                <div className="collapse-body filter-size-box flat-check-list">
+                  {SizeList.map((itm, idx) => (
+                    <div
+                      className={`${ActiveSize &&
+                          ActiveSize.toLowerCase() === itm.toLowerCase()
+                          ? "active"
+                          : ""
+                        } check-item size-item size-check`}
+                      key={idx}
+                      onClick={() => ApplyFilters("size", itm)}
+                    >
+                      <span className="size text-uppercase">{itm}</span>
+                      &nbsp;
+                      {/* <span className="count">(10)</span> */}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="widget-facet">
+              <div
+                className="facet-title text-xl fw-medium"
+                data-bs-target="#brand"
+                role="button"
+                data-bs-toggle="collapse"
+                aria-expanded="true"
+                aria-controls="brand"
+              >
+                <span>Brand</span>
+                <span className="icon icon-arrow-up"></span>
+              </div>
+              <div id="brand" className="collapse show">
+                <span className="reset-link text-decoration-underline" onClick={() => {
+                  const newParams = new URLSearchParams(window.location.search);
+                  newParams.delete('brand')
+                  newParams.set("cate", String(CategoryList[0]?.ParentCategoryId));
+                  setSearchParam(newParams);
+                  setisBrandChecked('')
+                }}>Reset</span>
+                <ul className="collapse-body filter-group-check current-scrollbar mt-4">
+                  {BrandList?.map((itm, idx) => (
+                    <li className="list-item" key={idx}>
+                      <input
+                        type="radio"
+                        name="brand"
+                        checked={isBrandChecked == itm?.BrandName}
+                        className="tf-check"
+                        id={idx}
+                      />
+                      <label
+                        htmlFor={idx}
+                        className="label"
+                        onClick={() => {
+                          ApplyFilters("brand", itm?.BrandName);
+                          setisBrandChecked(String(itm?.BrandName));
+                        }
+                        }
+                      >
+                        <span>{itm?.BrandName}</span>&nbsp;
+                        <span className="count">
+                          ({itm?.BrandCount})
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Box>
       </Drawer>
     </div>
   );

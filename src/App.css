@@ -1,0 +1,30 @@
+/* ✅ Ensure main product image is always visible */
+.card-product .img-product {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* ✅ Hide hover image until hover */
+.card-product .img-hover {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* ✅ On hover, show hover image and fade out base image */
+.card-product:hover .img-hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card-product:hover .img-product {
+  opacity: 0;
+  visibility: hidden;
+}
