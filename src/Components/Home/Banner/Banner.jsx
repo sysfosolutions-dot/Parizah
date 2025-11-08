@@ -15,10 +15,10 @@ const Banner_Container = () => {
   const img_URL = import.meta.env.VITE_PUBLIC_Banner;
 
   return (
-    <div className="container my-4"> 
+    <div className="container m-0 p-0"> 
       <div className="tf-slideshow slider-fashion-2">
         <Swiper
-          modules={[Navigation, Pagination, Autoplay, EffectFade]}
+          modules={[Pagination, Autoplay, EffectFade]}
           spaceBetween={10}
           slidesPerView={1}
           loop={true}
@@ -28,8 +28,8 @@ const Banner_Container = () => {
             delay: 2000,       // 3 sec autoplay
             disableOnInteraction: false,
           }}
-          pagination={{ clickable: true }}
-          navigation={true}
+          // pagination={{ clickable: true }}
+          Pagination={true}
           className="w-100"
         >
           {bannerData.map((item, index) => (
