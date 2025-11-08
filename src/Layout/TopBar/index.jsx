@@ -14,7 +14,7 @@ const Topbar = () => {
 
 
   return (
-    <div className="tf-topbar bg-light-green topbar-bg">
+    <div className="tf-topbar bg-dark topbar-bg">
       <div className="container">
         <div className="topbar-wraper">
           <div className="d-none d-xl-block flex-shrink-0">

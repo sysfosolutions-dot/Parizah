@@ -2596,7 +2596,8 @@ a:hover {
   background: transparent;
 }
 .header-default .box-nav-menu .menu-item {
-  padding: 33px 0px;
+  padding: 15px  0px;
+  position: relative;
 }
 .header-default .box-nav-menu .menu-item.active .item-link,
 .header-default .box-nav-menu .menu-item:hover .item-link {
@@ -2898,7 +2899,7 @@ a:hover {
 }
 
 .slider-fashion-2 {
-  padding: 0 15px;
+  padding: 0 0px;
   margin-top: 13px;
 }
 
@@ -2920,16 +2921,16 @@ a:hover {
   pointer-events: none;
   position: absolute;
   background-color: var(--white);
-  min-width: 300px;
+  min-width: 202px;
   z-index: 999;
   visibility: hidden;
   text-align: left;
-  padding: 32px;
+  padding: 20px;
   top: 85%;
   left: 0;
   opacity: 0;
   visibility: hidden;
-  border-radius: 16px;
+  border-radius: 6px;
   transform: translateX(0px) translateY(10px);
   box-shadow: var(--shadow1);
   -webkit-transition: all 0.3s ease-in-out;
@@ -2937,13 +2938,13 @@ a:hover {
   -ms-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
-  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1019607843);
+  box-shadow: 0px -1px 11px 0px rgb(0 0 0 / 12%);
 }
 .box-nav-menu .mega-menu {
   background-color: var(--white);
   margin: auto;
-  left: 24px;
-  right: 24px;
+      left: 1px;
+    right: 29px;
   max-height: calc(100vh - 71px);
   overflow: hidden auto;
 }
@@ -2980,13 +2981,13 @@ a:hover {
 }
 .box-nav-menu .mega-shop {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  max-width: 1763px;
+      grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 178px;
 }
 .box-nav-menu .mega-shop .wrapper-sub-menu {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* grid-template-columns: repeat(3, 1fr); */
   gap: 20px;
 }
 .box-nav-menu .mega-shop .wrapper-sub-collection {
@@ -3316,6 +3317,7 @@ header {
   z-index: 888;
   background-color: var(--white);
   font-family: "Poppins", sans-serif;
+  height: 60px;
 }
 header.header-bg {
   background-color: var(--white);
@@ -18073,7 +18075,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
     gap: 32px;
   }
   .slider-fashion-2 {
-    padding: 0px 24px;
+    padding: 0px 0px;
   }
   .slider-baby .clouds {
     bottom: -20px;
@@ -19222,7 +19224,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
     padding-right: 26px;
   }
   .header-default .wrapper-header {
-    min-height: 87px;
+    min-height: 72px;
   }
   .header-default .wrapper-header .nav-icon {
     gap: 20px;

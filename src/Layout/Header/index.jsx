@@ -55,7 +55,6 @@ const Header = () => {
   const handleSelect = (language) => setSelectedLanguage(language);
   const [isShopOpen, setIsShopOpen] = useState(false);
 
-
   const formattedCategories = menuList
     .filter((cat) => cat.ParentCategory === null)
     .map((parent) => ({
@@ -111,7 +110,6 @@ const Header = () => {
     }
   };
 
-
   const GoToprofile = () => {
     navigate("/account");
   };
@@ -150,6 +148,24 @@ const Header = () => {
               <i className="icon icon-categories1"></i>
             </div>
           </div>
+          <div className="col-xl-2 col-md-4 col-6 text-xxl-center">
+            <Link to="/" className="logo-header">
+              <img
+                src={`${
+                  import.meta.env.VITE_PUBLIC_COMPANY_LOGO
+                }/assets/CompanyLogo/Parizah_Logo.png`}
+                alt="logo"
+                className="logo"
+              />
+              {/* <img
+                src={`${import.meta.env.VITE_PUBLIC_COMPANY_LOGO}${
+                  CompanyDetails && CompanyDetails[0]?.CompanyLogo
+                }`}
+                alt="logo"
+                className="logo"
+              /> */}
+            </Link>
+          </div>
           <div className="col-xxl-5 col-xl-6 d-none d-xl-block">
             <nav className="box-navigation text-center">
               <ul className="box-nav-menu justify-content-start">
@@ -164,55 +180,75 @@ const Header = () => {
                   </Link>
                 </li>
                 <li className="menu-item">
-                  <a href="#" className="item-link"
+                  <a
+                    href="#"
+                    className="item-link"
                     onClick={(e) => {
                       e.preventDefault();
                       setIsShopOpen(!isShopOpen);
-                    }}>
-                    Shop<i className="icon icon-arr-down"></i>
+                    }}
+                  >
+                    Men<i className="icon icon-arr-down"></i>
                   </a>
                   <div className="sub-menu mega-menu mega-shop">
                     <div className="wrapper-sub-menu">
-                      {menuList
-                        .filter((item) => item.ParentCategory === null)
-                        .sort((a, b) => {
-                          if (a.CategoryName === "Kids") return 1;
-                          if (b.CategoryName === "Kids") return -1;
-                          return 0;
-                        })
-                        .map((parent) => (
-                          <div
-                            className="mega-menu-item"
-                            key={parent.CategoryId}
-                          >
-                            <div className="menu-heading">
-                              {parent.CategoryName}
-                            </div>
-                            <ul className="menu-list">
-                              {menuList
-                                .filter(
-                                  (itm) =>
-                                    itm.ParentCategory === parent.CategoryName
-                                )
-                                .map((item, idx) => (
-                                  <li key={idx}>
-                                    <Link
-                                      to={`/collection/${item?.ParentCategory}?cate=${item?.CategoryId}`}
-                                      className="menu-link-text link"
-                                      onClick={() => {
-                                        setIsShopOpen(false); // ✅ close dropdown
-                                        window.scrollTo(0, 0); // optional scroll to top
-                                      }}
-                                    >
-                                      {item.CategoryName}
-                                    </Link>
-                                  </li>
-                                ))}
-                            </ul>
-                          </div>
-                        ))}
+                      <div className="mega-menu-item">
+                        <ul className="menu-list">
+                          <li>
+                            {" "}
+                            <Link
+                              to={`/multikart/userarea/collection/Women?cate=1007`}
+                              className="menu-link-text link"
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                              Sherwani
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1008`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                              Nehru Jacket
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1009`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                              data-discover="true"
+                            >
+                              Kurta Pajama
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1009`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                              data-discover="true"
+                            >
+                              Dhoti Kurta
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="wrapper-sub-collection">
+                    {/* <div className="wrapper-sub-collection">
                       <Swiper
                         modules={[Navigation]}
                         spaceBetween={20}
@@ -257,6 +293,109 @@ const Header = () => {
                           </SwiperSlide>
                         ))}
                       </Swiper>
+                    </div> */}
+                  </div>
+                </li>
+                <li className="menu-item">
+                  <a
+                    href="#"
+                    className="item-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsShopOpen(!isShopOpen);
+                    }}
+                  >
+                    Women<i className="icon icon-arr-down"></i>
+                  </a>
+                  <div className="sub-menu mega-menu mega-shop">
+                    <div className="wrapper-sub-menu">
+                      <div className="mega-menu-item">
+                        <ul className="menu-list">
+                          <li>
+                            <Link
+                              to={`/multikart/userarea/collection/Women?cate=1007`}
+                              className="menu-link-text link"
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                              KurtaSuit
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1008`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                              Saree
+
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1009`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                              data-discover="true"
+                            >
+                             Lehenga Choli
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li className="menu-item">
+                  <a
+                    href="#"
+                    className="item-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsShopOpen(!isShopOpen);
+                    }}
+                  >
+                    Kids<i className="icon icon-arr-down"></i>
+                  </a>
+                  <div className="sub-menu mega-menu mega-shop">
+                    <div className="wrapper-sub-menu">
+                         <div className="mega-menu-item">
+                        <ul className="menu-list">
+                          <li>
+                            <Link
+                              to={`/multikart/userarea/collection/Women?cate=1007`}
+                              className="menu-link-text link"
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                             Boys Clothing
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="menu-link-text link"
+                              to={`/multikart/userarea/collection/Women?cate=1008`}
+                              onClick={() => {
+                                setIsShopOpen(false); // ✅ close dropdown
+                                window.scrollTo(0, 0); // optional scroll to top
+                              }}
+                            >
+                             Girls Clothing
+
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -332,16 +471,7 @@ const Header = () => {
               </ul>
             </nav>
           </div>
-          <div className="col-xl-2 col-md-4 col-6 text-xxl-center">
-            <Link to="/" className="logo-header">
-              <img
-                src={`${import.meta.env.VITE_PUBLIC_COMPANY_LOGO}${CompanyDetails && CompanyDetails[0]?.CompanyLogo
-                  }`}
-                alt="logo"
-                className="logo"
-              />
-            </Link>
-          </div>
+
           <div className="col-xxl-5 col-xl-4 col-md-4 col-3">
             <ul className="nav-icon d-flex justify-content-end align-items-center">
               <li
@@ -376,9 +506,9 @@ const Header = () => {
                     isLogin
                       ? FetchWishlist()
                       : showAlert(
-                        "Not logged in yet.",
-                        "Login required to access this feature."
-                      );
+                          "Not logged in yet.",
+                          "Login required to access this feature."
+                        );
                   }}
                 >
                   <i className="icon icon-heart"></i>
@@ -609,8 +739,9 @@ const Header = () => {
                       </li>
                       <li className="nav-mb-item">
                         <a
-                          className={`mb-menu-link ${OpenMenu === 1 ? "" : "collapsed"
-                            }`}
+                          className={`mb-menu-link ${
+                            OpenMenu === 1 ? "" : "collapsed"
+                          }`}
                           onClick={() => toggleDropdown(1)}
                           aria-expanded="true"
                           aria-controls="dropdown-menu-shop"
@@ -627,10 +758,11 @@ const Header = () => {
                             {formattedCategories.map((parent, index) => (
                               <li key={parent.CategoryId}>
                                 <div
-                                  className={`sub-nav-link ${childMenu === parent.CategoryName
-                                    ? ""
-                                    : "collapsed"
-                                    }`}
+                                  className={`sub-nav-link ${
+                                    childMenu === parent.CategoryName
+                                      ? ""
+                                      : "collapsed"
+                                  }`}
                                   onClick={() =>
                                     openChildMenu(parent.CategoryName)
                                   }
@@ -654,12 +786,10 @@ const Header = () => {
                                         <Link
                                           to={`/collection/${parent.CategoryName}?cate=${child.CategoryId}`}
                                           className="sub-nav-link"
-                                         onClick={() => setOpen(false)} // ✅ instantly closes drawer
-
+                                          onClick={() => setOpen(false)} // ✅ instantly closes drawer
                                         >
                                           {child.CategoryName}
                                         </Link>
-
                                       </li>
                                     ))}
                                   </ul>
@@ -768,8 +898,9 @@ const Header = () => {
                                   style={{ width: "50px" }}
                                 >
                                   <img
-                                    src={`${import.meta.env.BASE_URL
-                                      }/assets/Images/${Currency?.ImgURL}`}
+                                    src={`${
+                                      import.meta.env.BASE_URL
+                                    }/assets/Images/${Currency?.ImgURL}`}
                                     alt="flag"
                                   />
                                   <span>
