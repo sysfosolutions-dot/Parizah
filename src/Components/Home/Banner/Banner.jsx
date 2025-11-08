@@ -15,7 +15,7 @@ const Banner_Container = () => {
   const img_URL = import.meta.env.VITE_PUBLIC_Banner;
 
   return (
-    <div className="container m-0 p-0"> 
+    <div className="m-0 p-0"> 
       <div className="tf-slideshow slider-fashion-2">
         <Swiper
           modules={[Pagination, Autoplay, EffectFade]}
