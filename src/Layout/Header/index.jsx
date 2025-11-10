@@ -25,6 +25,8 @@ import ProductContext from "../../Context/Products";
 import SearchModal from "../../Components/Common/Modal/SearchModal";
 import { useSweetAlert } from "../../Context/SweetAlert";
 
+
+
 const Header = () => {
   const img_URL = import.meta.env.VITE_IMG_URL;
   const Img_URL = import.meta.env.BASE_URL;
