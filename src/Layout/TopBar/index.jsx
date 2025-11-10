@@ -112,7 +112,7 @@ const Topbar = () => {
                       </div>
                     )}
                   </div>
-                </OutsideClickHandler>
+                </OutsideClickHandler>   
               </div>
             </div>
           </div>
