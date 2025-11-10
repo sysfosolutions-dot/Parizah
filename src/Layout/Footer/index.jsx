@@ -153,6 +153,7 @@ const GoToprofile =()=>{
         resetForm();
       }}
     >
+        
       {() => (
         <Form className="form-newsletter">
           <div className="subscribe-content">
