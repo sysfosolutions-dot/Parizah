@@ -302,7 +302,7 @@ const Header = () => {
                     : GoToprofile()
                 }
               >
-                <span className="UserName">Afzal Ansari</span>
+                {/* <span className="UserName">Afzal Ansari</span> */}
                 <a data-bs-toggle="offcanvas" className="nav-icon-item">
                   <i className="icon icon-user"></i>
                   {isLogin ? (
